@@ -2,6 +2,7 @@
 A mixed integer programming solution to the maximum phylogenetic diversity problem
 
 ## Invocation
+```
 Usage:
 choose_optimal_leaves.py <tree> <costs> <budget> <num_leaves_to_choose> [-v -h -o]
 
@@ -14,4 +15,4 @@ Arguments:
 Options:
 -v --verbose            Verbose logging
 -h --help               Help text
-
+```
