@@ -1,5 +1,6 @@
 # optimize_over_tree
-A mixed integer programming solution to the maximum phylogenetic diversity problem
+A mixed integer programming solution to the maximum phylogenetic diversity with cost constraints problem.
+Requires the following packages: docopt, scikit-bio, and pulp
 
 ## Invocation
 ```
