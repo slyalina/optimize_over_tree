@@ -1,6 +1,6 @@
 # optimize_over_tree
 A mixed integer programming solution to the maximum phylogenetic diversity with cost constraints problem.
-Requires the following packages: docopt, scikit-bio, and pulp
+Requires the following packages: docopt, scikit-bio, and pulp (version 4 or later) with the CBC solver (`coin-or-cbc`)
 
 ## Invocation
 ```

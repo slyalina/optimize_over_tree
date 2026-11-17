@@ -48,11 +48,11 @@ def solve_optimization(tree_file, num_leaves_requested, leaf_costs_file, budget)
             costs[tip_name] = float(cost)
     tree_info = convert_tree_to_bipartite(tree_file)
     prob = LpProblem("Solving for maximal PD with " + str(num_leaves_requested) + " requested", LpMaximize)
-    leaves_indicator = LpVariable.dicts("t", tree_info["ancestors_dict"].keys(), 0, 1, LpInteger)
-    ancestors_indicator = LpVariable.dicts("n",
-                                           [node.id for node in tree_info["tree"].find_by_func(lambda x:
-                                                                                               not x.is_tip())],
-                                           0, 1, LpInteger)
+    leaves_indicator = prob.add_variable_dicts("t", list(tree_info["ancestors_dict"].keys()), 0, 1, LpInteger)
+    ancestors_indicator = prob.add_variable_dicts("n",
+                                                  [node.id for node in tree_info["tree"].find_by_func(lambda x:
+                                                                                                      not x.is_tip())],
+                                                  0, 1, LpInteger)
 
     # The main objective is to maximize the sum of active edge lengths
     prob += lpSum([ancestors_indicator[node] * tree_info["edge_lengths"][node] for node in ancestors_indicator] +
@@ -67,11 +67,14 @@ def solve_optimization(tree_file, num_leaves_requested, leaf_costs_file, budget)
     prob += costs_sum <= budget
 
     # If an ancestor node is active, it should have at least 1 corresponding tip active
-    for tip in leaves_indicator:
-        prob += leaves_indicator[tip] - \
-                lpSum([ancestors_indicator[ancestor] for ancestor in tree_info["ancestors_dict"][tip]]) >= 0
+    tips_below = defaultdict(list)
+    for tip, ancestors in tree_info["ancestors_dict"].items():
+        for ancestor in ancestors:
+            tips_below[ancestor].append(leaves_indicator[tip])
+    for ancestor in ancestors_indicator:
+        prob += lpSum(tips_below[ancestor]) - ancestors_indicator[ancestor] >= 0
 
-    status = prob.solve()
+    status = prob.solve(COIN_CMD(msg=False))
     logging.debug("Status of optimizer = {}".format(status))
     for k, v in leaves_indicator.items():
         if v.value() > 0:
